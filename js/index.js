@@ -8,6 +8,13 @@ const config = {
         preload, // Se ejecuta para cargar recursos
         create, // Se ejecutan cuando comienza el juego
         update // Se ejecuta en cada frame
+    },
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: false,
+            gravity: { y: 300 }
+        }
     }
 };
 
@@ -43,13 +50,14 @@ function create() {
         .setOrigin(0, 0)
         .setScale(0.15);
 
-    this.add.tileSprite(0, config.height - 32, config.width, 32, 'floorbricks')
+    this.floor = this.physics.add.staticGroup();
+    this.floor.create(0, config.height - 16, 'floorbricks')
+        .setOrigin(0, 0.5);
+
+    this.mario = this.physics.add.sprite(50, 190, 'mario')
         .setOrigin(0, 0);
 
-    this.mario = this.add.sprite(50, 195, 'mario')
-        .setOrigin(0, 0);
-
-    this.keys = this.input.keyboard.createCursorKeys();
+    this.physics.add.collider(this.mario, this.floor);
 
     this.anims.create({
         repeat: -1,
@@ -65,6 +73,8 @@ function create() {
         key: 'mario-idle',
         frames: [{ key: 'mario', frame: 0 }]
     });
+
+    this.keys = this.input.keyboard.createCursorKeys();
 }
 
 function update() {
