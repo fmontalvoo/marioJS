@@ -46,10 +46,39 @@ function create() {
     this.add.tileSprite(0, config.height - 32, config.width, 32, 'floorbricks')
         .setOrigin(0, 0);
 
-    this.add.sprite(50, 195, 'mario')
+    this.mario = this.add.sprite(50, 195, 'mario')
         .setOrigin(0, 0);
+
+    this.keys = this.input.keyboard.createCursorKeys();
+
+    this.anims.create({
+        repeat: -1,
+        frameRate: 12,
+        key: 'mario-walk',
+        frames: this.anims.generateFrameNumbers(
+            'mario',
+            { start: 1, end: 3 }
+        ),
+    });
+
+    this.anims.create({
+        key: 'mario-idle',
+        frames: [{ key: 'mario', frame: 0 }]
+    });
 }
 
 function update() {
-
+    if (this.keys.left.isDown) {
+        this.mario.x -= 2;
+        this.mario.flipX = true;
+        this.mario.anims.play('mario-walk', true);
+    }
+    else if (this.keys.right.isDown) {
+        this.mario.x += 2;
+        this.mario.flipX = false;
+        this.mario.anims.play('mario-walk', true);
+    }
+    else {
+        this.mario.anims.play('mario-idle', true);
+    }
 }
