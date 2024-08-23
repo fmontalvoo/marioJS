@@ -52,10 +52,17 @@ function create() {
 
     this.floor = this.physics.add.staticGroup();
     this.floor.create(0, config.height - 16, 'floorbricks')
-        .setOrigin(0, 0.5);
+        .setOrigin(0, 0.5)
+        .refreshBody();
+
+    this.floor.create(150, config.height - 16, 'floorbricks')
+        .setOrigin(0, 0.5)
+        .refreshBody();
 
     this.mario = this.physics.add.sprite(50, 190, 'mario')
-        .setOrigin(0, 0);
+        .setOrigin(0, 0)
+        .setGravityY(300)
+        .setCollideWorldBounds(true);
 
     this.physics.add.collider(this.mario, this.floor);
 
@@ -74,21 +81,33 @@ function create() {
         frames: [{ key: 'mario', frame: 0 }]
     });
 
+    this.anims.create({
+        key: 'mario-jump',
+        frames: [{ key: 'mario', frame: 5 }]
+    });
+
     this.keys = this.input.keyboard.createCursorKeys();
 }
 
 function update() {
-    if (this.keys.left.isDown) {
+    if (this.keys.space.isDown && this.mario.body.touching.down) {
+        this.mario.anims.play('mario-jump', true);
+        this.mario.setVelocityY(-200);
+    } else if (this.keys.left.isDown) {
+        if (this.mario.body.touching.down) {
+            this.mario.anims.play('mario-walk', true);
+        }
         this.mario.x -= 2;
         this.mario.flipX = true;
-        this.mario.anims.play('mario-walk', true);
-    }
-    else if (this.keys.right.isDown) {
+    } else if (this.keys.right.isDown) {
+        if (this.mario.body.touching.down) {
+            this.mario.anims.play('mario-walk', true);
+        }
         this.mario.x += 2;
         this.mario.flipX = false;
-        this.mario.anims.play('mario-walk', true);
-    }
-    else {
-        this.mario.anims.play('mario-idle', true);
+    } else {
+        if (this.mario.body.touching.down) {
+            this.mario.anims.play('mario-idle', true);
+        }
     }
 }
