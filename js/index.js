@@ -43,6 +43,11 @@ function preload() {
             frameHeight: 16
         }
     );
+
+    this.load.audio(
+        'gameover',
+        'assets/sound/music/gameover.mp3'
+    );
 }
 
 function create() {
@@ -81,7 +86,7 @@ function update() {
     if (this.mario.isDead) {
         return;
     }
-    
+
     if (this.keys.space.isDown && this.mario.body.touching.down) {
         this.mario.anims.play('mario-jump', true);
         this.mario.setVelocityY(-200);
@@ -108,6 +113,7 @@ function update() {
         this.mario.setVelocity(0, 0);
         this.mario.setCollideWorldBounds(false);
         this.mario.anims.play('mario-death', true);
+        this.sound.add('gameover', { vloume: .2 }).play();
         setTimeout(() => this.mario.setVelocityY(-350), 100);
         setTimeout(() => this.scene.restart(), 2000);
     }
