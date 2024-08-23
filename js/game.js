@@ -1,3 +1,4 @@
+import { gameControls } from './controls.js';
 import { createAnimations } from './animations.js';
 
 const config = {
@@ -83,38 +84,20 @@ function create() {
 }
 
 function update() {
-    if (this.mario.isDead) {
+    const { mario } = this;
+
+    if (mario.isDead)
         return;
-    }
 
-    if (this.keys.space.isDown && this.mario.body.touching.down) {
-        this.mario.anims.play('mario-jump', true);
-        this.mario.setVelocityY(-200);
-    } else if (this.keys.left.isDown) {
-        if (this.mario.body.touching.down) {
-            this.mario.anims.play('mario-walk', true);
-        }
-        this.mario.x -= 2;
-        this.mario.flipX = true;
-    } else if (this.keys.right.isDown) {
-        if (this.mario.body.touching.down) {
-            this.mario.anims.play('mario-walk', true);
-        }
-        this.mario.x += 2;
-        this.mario.flipX = false;
-    } else {
-        if (this.mario.body.touching.down) {
-            this.mario.anims.play('mario-idle', true);
-        }
-    }
+    gameControls(this);
 
-    if (this.mario.y >= config.height) {
-        this.mario.isDead = true;
-        this.mario.setVelocity(0, 0);
-        this.mario.setCollideWorldBounds(false);
-        this.mario.anims.play('mario-death', true);
-        this.sound.add('gameover', { vloume: .2 }).play();
-        setTimeout(() => this.mario.setVelocityY(-350), 100);
+    if (mario.y >= config.height) {
+        mario.isDead = true;
+        mario.setVelocity(0, 0);
+        this.sound.play('gameover');
+        mario.setCollideWorldBounds(false);
+        mario.anims.play('mario-death', true);
+        setTimeout(() => mario.setVelocityY(-350), 100);
         setTimeout(() => this.scene.restart(), 2000);
     }
 }
