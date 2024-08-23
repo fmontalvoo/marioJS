@@ -1,3 +1,5 @@
+import { createAnimations } from './animations.js';
+
 const config = {
     type: Phaser.AUTO,
     width: 256,
@@ -55,41 +57,31 @@ function create() {
         .setOrigin(0, 0.5)
         .refreshBody();
 
-    this.floor.create(150, config.height - 16, 'floorbricks')
+    this.floor.create(180, config.height - 16, 'floorbricks')
         .setOrigin(0, 0.5)
         .refreshBody();
 
     this.mario = this.physics.add.sprite(50, 190, 'mario')
-        .setOrigin(0, 0)
+        .setOrigin(0, 1)
         .setGravityY(300)
         .setCollideWorldBounds(true);
 
+    this.physics.world.setBounds(0, 0, 512, config.height);
     this.physics.add.collider(this.mario, this.floor);
 
-    this.anims.create({
-        repeat: -1,
-        frameRate: 12,
-        key: 'mario-walk',
-        frames: this.anims.generateFrameNumbers(
-            'mario',
-            { start: 1, end: 3 }
-        ),
-    });
+    this.cameras.main.setBounds(0, 0, 2000, config.height);
+    this.cameras.main.startFollow(this.mario);
 
-    this.anims.create({
-        key: 'mario-idle',
-        frames: [{ key: 'mario', frame: 0 }]
-    });
-
-    this.anims.create({
-        key: 'mario-jump',
-        frames: [{ key: 'mario', frame: 5 }]
-    });
+    createAnimations(this);
 
     this.keys = this.input.keyboard.createCursorKeys();
 }
 
 function update() {
+    if (this.mario.isDead) {
+        return;
+    }
+    
     if (this.keys.space.isDown && this.mario.body.touching.down) {
         this.mario.anims.play('mario-jump', true);
         this.mario.setVelocityY(-200);
@@ -109,5 +101,14 @@ function update() {
         if (this.mario.body.touching.down) {
             this.mario.anims.play('mario-idle', true);
         }
+    }
+
+    if (this.mario.y >= config.height) {
+        this.mario.isDead = true;
+        this.mario.setVelocity(0, 0);
+        this.mario.setCollideWorldBounds(false);
+        this.mario.anims.play('mario-death', true);
+        setTimeout(() => this.mario.setVelocityY(-350), 100);
+        setTimeout(() => this.scene.restart(), 2000);
     }
 }
